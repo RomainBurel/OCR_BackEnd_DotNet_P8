@@ -1,7 +1,7 @@
 ﻿using GpsUtil.Location;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using TourGuide.LibrairiesWrappers.Interfaces;
 using TourGuide.Services.Interfaces;
 using TourGuide.Users;
@@ -15,18 +15,20 @@ public class TourGuideService : ITourGuideService
     private readonly ILogger _logger;
     private readonly IGpsUtil _gpsUtil;
     private readonly IRewardsService _rewardsService;
+    private readonly IRewardCentral _rewardCentral;
     private readonly TripPricer.TripPricer _tripPricer;
     public Tracker Tracker { get; private set; }
     private readonly Dictionary<string, User> _internalUserMap = new();
     private const string TripPricerApiKey = "test-server-api-key";
     private bool _testMode = true;
 
-    public TourGuideService(ILogger<TourGuideService> logger, IGpsUtil gpsUtil, IRewardsService rewardsService, ILoggerFactory loggerFactory)
+    public TourGuideService(ILogger<TourGuideService> logger, IGpsUtil gpsUtil, IRewardsService rewardsService, IRewardCentral rewardCentral, ILoggerFactory loggerFactory)
     {
         _logger = logger;
         _tripPricer = new();
         _gpsUtil = gpsUtil;
         _rewardsService = rewardsService;
+        _rewardCentral = rewardCentral;
 
         CultureInfo.CurrentCulture = new CultureInfo("en-US");
 
@@ -90,15 +92,28 @@ public class TourGuideService : ITourGuideService
         return visitedLocation;
     }
 
-    public List<Attraction> GetNearByAttractions(VisitedLocation visitedLocation)
+    public JsonArray GetNearByAttractions(VisitedLocation visitedLocation)
     {
         var allAttractions = _gpsUtil.GetAttractions();
         if (allAttractions.Count > 5)
         {
-            return allAttractions.OrderBy(a => _rewardsService.GetDistance(a, visitedLocation.Location)).Take(5).ToList();
+            allAttractions = allAttractions.OrderBy(a => _rewardsService.GetDistance(a, visitedLocation.Location)).Take(5).ToList();
         }
+        var result = new JsonArray();
+        allAttractions.ForEach(a =>
+        {
+            var attractionNode = new JsonObject();
+            attractionNode.Add("AttractionName", a.AttractionName);
+            attractionNode.Add("AttractionLatitude", a.Latitude);
+            attractionNode.Add("AttractionLongitude", a.Longitude);
+            attractionNode.Add("UserLocationLatitude", visitedLocation.Location.Latitude);
+            attractionNode.Add("UserLocationLongitude", visitedLocation.Location.Longitude);
+            attractionNode.Add("Distance", _rewardsService.GetDistance(a, visitedLocation.Location));
+            attractionNode.Add("Rewards", _rewardCentral.GetAttractionRewardPoints(a.AttractionId, visitedLocation.UserId));
+            result.Add(attractionNode);
+        });
 
-        return allAttractions!;
+        return result;
     }
 
     private void AddShutDownHook()

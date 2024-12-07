@@ -42,6 +42,11 @@ public class User
         }
     }
 
+    public void ClearUserRewards()
+    {
+        UserRewards.Clear();
+    }
+
     public VisitedLocation GetLastVisitedLocation()
     {
         return VisitedLocations.ElementAt(^1);
