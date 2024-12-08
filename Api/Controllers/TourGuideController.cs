@@ -19,16 +19,16 @@ public class TourGuideController : ControllerBase
     }
 
     [HttpGet("getLocation")]
-    public ActionResult<VisitedLocation> GetLocation([FromQuery] string userName)
+    public async Task<ActionResult<VisitedLocation>> GetLocation([FromQuery] string userName)
     {
-        var location = _tourGuideService.GetUserLocation(GetUser(userName));
+        var location = await _tourGuideService.GetUserLocation(GetUser(userName));
         return Ok(location);
     }
 
     [HttpGet("getNearbyAttractions")]
-    public ActionResult<JsonArray> GetNearbyAttractions([FromQuery] string userName)
+    public async Task<ActionResult<JsonArray>> GetNearbyAttractions([FromQuery] string userName)
     {
-        var visitedLocation = _tourGuideService.GetUserLocation(GetUser(userName));
+        var visitedLocation = await _tourGuideService.GetUserLocation(GetUser(userName));
         var attractions = _tourGuideService.GetNearByAttractions(visitedLocation);
         return Ok(attractions);
     }

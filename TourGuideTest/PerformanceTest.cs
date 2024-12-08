@@ -1,14 +1,6 @@
 ﻿using GpsUtil.Location;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TourGuide.LibrairiesWrappers.Interfaces;
-using TourGuide.Services.Interfaces;
 using TourGuide.Users;
-using TourGuide.Utilities;
 using Xunit.Abstractions;
 
 namespace TourGuideTest
@@ -44,8 +36,8 @@ namespace TourGuideTest
             _output = output;
         }
 
-        [Fact(Skip = ("Delete Skip when you want to pass the test"))]
-        public void HighVolumeTrackLocation()
+        [Fact]
+        public async void HighVolumeTrackLocation()
         {
             //On peut ici augmenter le nombre d'utilisateurs pour tester les performances
             _fixture.Initialize(1000);
@@ -57,7 +49,7 @@ namespace TourGuideTest
 
             foreach (var user in allUsers)
             {
-                _fixture.TourGuideService.TrackUserLocation(user);
+                await _fixture.TourGuideService.TrackUserLocation(user);
             }
             stopWatch.Stop();
             _fixture.TourGuideService.Tracker.StopTracking();

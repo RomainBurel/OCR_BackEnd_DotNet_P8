@@ -19,13 +19,13 @@ public class RewardServiceTest : IClassFixture<DependencyFixture>
     }
 
     [Fact]
-    public void UserGetRewards()
+    public async void UserGetRewards()
     {
         _fixture.Initialize(0);
         var user = new User(Guid.NewGuid(), "jon", "000", "jon@tourGuide.com");
         var attraction = _fixture.GpsUtil.GetAttractions().First();
         user.AddToVisitedLocations(new VisitedLocation(user.UserId, attraction, DateTime.Now));
-        _fixture.TourGuideService.TrackUserLocation(user);
+        await _fixture.TourGuideService.TrackUserLocation(user);
         var userRewards = user.UserRewards;
         _fixture.TourGuideService.Tracker.StopTracking();
         Assert.True(userRewards.Count == 1);
@@ -51,5 +51,4 @@ public class RewardServiceTest : IClassFixture<DependencyFixture>
 
         Assert.Equal(_fixture.GpsUtil.GetAttractions().Count, userRewards.Count);
     }
-
 }
