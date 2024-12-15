@@ -1,6 +1,5 @@
 ﻿using GpsUtil.Location;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Nodes;
 using TourGuide.Services.Interfaces;
 using TourGuide.Users;
 using TripPricer;
@@ -26,7 +25,7 @@ public class TourGuideController : ControllerBase
     }
 
     [HttpGet("getNearbyAttractions")]
-    public async Task<ActionResult<JsonArray>> GetNearbyAttractions([FromQuery] string userName)
+    public async Task<ActionResult<List<NearbyAttraction>>> GetNearbyAttractions([FromQuery] string userName)
     {
         var visitedLocation = await _tourGuideService.GetUserLocation(GetUser(userName));
         var attractions = _tourGuideService.GetNearByAttractions(visitedLocation);

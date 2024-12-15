@@ -91,25 +91,25 @@ public class TourGuideService : ITourGuideService
         return visitedLocation;
     }
 
-    public JsonArray GetNearByAttractions(VisitedLocation visitedLocation)
+    public List<NearbyAttraction> GetNearByAttractions(VisitedLocation visitedLocation)
     {
         var allAttractions = _gpsUtil.GetAttractions();
         if (allAttractions.Count > 5)
         {
             allAttractions = allAttractions.OrderBy(a => _rewardsService.GetDistance(a, visitedLocation.Location)).Take(5).ToList();
         }
-        var result = new JsonArray();
+        var result = new List<NearbyAttraction>();
         allAttractions.ForEach(a =>
         {
-            var attractionNode = new JsonObject();
-            attractionNode.Add("AttractionName", a.AttractionName);
-            attractionNode.Add("AttractionLatitude", a.Latitude);
-            attractionNode.Add("AttractionLongitude", a.Longitude);
-            attractionNode.Add("UserLocationLatitude", visitedLocation.Location.Latitude);
-            attractionNode.Add("UserLocationLongitude", visitedLocation.Location.Longitude);
-            attractionNode.Add("Distance", _rewardsService.GetDistance(a, visitedLocation.Location));
-            attractionNode.Add("Rewards", _rewardCentral.GetAttractionRewardPoints(a.AttractionId, visitedLocation.UserId));
-            result.Add(attractionNode);
+            var nearByAttraction = new NearbyAttraction();
+            nearByAttraction.AttractionName = a.AttractionName;
+            nearByAttraction.AttractionLatitude = a.Latitude;
+            nearByAttraction.AttractionLongitude = a.Longitude;
+            nearByAttraction.UserLocationLatitude = visitedLocation.Location.Latitude;
+            nearByAttraction.UserLocationLongitude = visitedLocation.Location.Longitude;
+            nearByAttraction.Distance = _rewardsService.GetDistance(a, visitedLocation.Location);
+            nearByAttraction.Rewards = _rewardCentral.GetAttractionRewardPoints(a.AttractionId, visitedLocation.UserId);
+            result.Add(nearByAttraction);
         });
 
         return result;
