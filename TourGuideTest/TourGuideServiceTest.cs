@@ -1,12 +1,4 @@
-﻿using GpsUtil.Location;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TourGuide.Services;
-using TourGuide.Users;
-using TourGuide.Utilities;
+﻿using TourGuide.Users;
 using TripPricer;
 
 namespace TourGuideTest
@@ -26,11 +18,11 @@ namespace TourGuideTest
         }
 
         [Fact]
-        public void GetUserLocation()
+        public async void GetUserLocation()
         {
             _fixture.Initialize(0);
             var user = new User(Guid.NewGuid(), "jon", "000", "jon@tourGuide.com");
-            var visitedLocation = _fixture.TourGuideService.TrackUserLocation(user);
+            var visitedLocation = await _fixture.TourGuideService.TrackUserLocation(user);
             _fixture.TourGuideService.Tracker.StopTracking();
 
             Assert.Equal(user.UserId, visitedLocation.UserId);
@@ -74,11 +66,11 @@ namespace TourGuideTest
         }
 
         [Fact]
-        public void TrackUser()
+        public async void TrackUser()
         {
             _fixture.Initialize();
             var user = new User(Guid.NewGuid(), "jon", "000", "jon@tourGuide.com");
-            var visitedLocation = _fixture.TourGuideService.TrackUserLocation(user);
+            var visitedLocation = await _fixture.TourGuideService.TrackUserLocation(user);
 
             _fixture.TourGuideService.Tracker.StopTracking();
 
@@ -86,12 +78,11 @@ namespace TourGuideTest
         }
 
         [Fact]
-        public void GetNearbyAttractions()
+        public async void GetNearbyAttractions()
         {
             _fixture.Initialize(0);
             var user = new User(Guid.NewGuid(), "jon", "000", "jon@tourGuide.com");
-            var visitedLocation = _fixture.TourGuideService.TrackUserLocation(user);
-
+            var visitedLocation = await _fixture.TourGuideService.TrackUserLocation(user);
             var attractions = _fixture.TourGuideService.GetNearByAttractions(visitedLocation);
 
             _fixture.TourGuideService.Tracker.StopTracking();
