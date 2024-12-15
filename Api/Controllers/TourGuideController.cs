@@ -1,5 +1,6 @@
 ﻿using GpsUtil.Location;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Nodes;
 using TourGuide.Services.Interfaces;
 using TourGuide.Users;
 using TripPricer;
@@ -18,25 +19,16 @@ public class TourGuideController : ControllerBase
     }
 
     [HttpGet("getLocation")]
-    public ActionResult<VisitedLocation> GetLocation([FromQuery] string userName)
+    public async Task<ActionResult<VisitedLocation>> GetLocation([FromQuery] string userName)
     {
-        var location = _tourGuideService.GetUserLocation(GetUser(userName));
+        var location = await _tourGuideService.GetUserLocation(GetUser(userName));
         return Ok(location);
     }
 
-    // TODO: Change this method to no longer return a List of Attractions.
-    // Instead: Get the closest five tourist attractions to the user - no matter how far away they are.
-    // Return a new JSON object that contains:
-    // Name of Tourist attraction, 
-    // Tourist attractions lat/long, 
-    // The user's location lat/long, 
-    // The distance in miles between the user's location and each of the attractions.
-    // The reward points for visiting each Attraction.
-    //    Note: Attraction reward points can be gathered from RewardsCentral
     [HttpGet("getNearbyAttractions")]
-    public ActionResult<List<Attraction>> GetNearbyAttractions([FromQuery] string userName)
+    public async Task<ActionResult<JsonArray>> GetNearbyAttractions([FromQuery] string userName)
     {
-        var visitedLocation = _tourGuideService.GetUserLocation(GetUser(userName));
+        var visitedLocation = await _tourGuideService.GetUserLocation(GetUser(userName));
         var attractions = _tourGuideService.GetNearByAttractions(visitedLocation);
         return Ok(attractions);
     }
