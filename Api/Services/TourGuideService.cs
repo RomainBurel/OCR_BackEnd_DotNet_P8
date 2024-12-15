@@ -1,6 +1,5 @@
 ﻿using GpsUtil.Location;
 using System.Globalization;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using TourGuide.LibrairiesWrappers.Interfaces;
 using TourGuide.Services.Interfaces;
