@@ -34,7 +34,6 @@ public class RewardsService : IRewardsService
 
     public async Task CalculateRewards(User user)
     {
-        user.ClearUserRewards();
         ConcurrentBag<VisitedLocation> userLocations = user.VisitedLocations;
         List<Attraction> attractions = _gpsUtil.GetAttractions();
         var newUserRewards = new ConcurrentBag<UserReward>();
